@@ -1,0 +1,56 @@
+version: '3.7'
+
+x-common-resources: &common-resources
+  resources:
+    limits:
+      cpus: '0.5'  # Лимит на использование CPU в долях
+      memory: '2Gb'  # Лимит на использование памяти
+
+services:
+  mongodb:
+    build: ./mongodb
+    ports:
+      - "27017:27017"
+
+  data_generator:
+    build: ./data_generator
+    depends_on:
+      - mongodb
+    environment:
+      - NUM_TEST_DATA=500000 # Здесь задается количество создаваемых тестовых данных
+
+  benchmark_golang:
+    build: ./benchmarks/golang
+    deploy:
+      <<: *common-resources
+    depends_on:
+      - mongodb
+
+  # Nodejs
+  benchmark_nodejs_xlsx:
+    build: ./benchmarks/nodejs_xlsx
+    deploy:
+      <<: *common-resources
+    depends_on:
+      - mongodb
+  benchmark_nodejs_:
+    build: ./benchmarks/nodejs_xlsx
+    deploy:
+      <<: *common-resources
+    depends_on:
+      - mongodb
+
+  # Python
+  benchmark_python_pandas:
+    build: ./benchmarks/python_pandas
+    deploy:
+      <<: *common-resources
+    depends_on:
+      - mongodb
+
+  benchmark_python_pyexcelerate:
+    build: ./benchmarks/python_pyexcelerate
+    deploy:
+      <<: *common-resources
+    depends_on:
+      - mongodb
